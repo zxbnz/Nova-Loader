@@ -2,83 +2,95 @@ local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local PlayerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
 
--- Destroy any existing loader
-if PlayerGui:FindFirstChild("NovaScriptLoader") then
-	PlayerGui.NovaScriptLoader:Destroy()
-end
+-- Destroy any previous loader
+local existing = PlayerGui:FindFirstChild("NovaScriptLoader")
+if existing then existing:Destroy() end
 
--- Create GUI
+-- Create ScreenGui
 local gui = Instance.new("ScreenGui")
 gui.Name = "NovaScriptLoader"
 gui.ResetOnSpawn = false
 gui.Parent = PlayerGui
 
--- Main Frame
+-- Frame
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 250, 0, 180)
-frame.Position = UDim2.new(0.5, -125, 0.5, -90)
+frame.Size = UDim2.new(0, 260, 0, 200)
+frame.Position = UDim2.new(0.5, -130, 0.5, -100)
 frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 frame.BorderSizePixel = 0
 frame.Parent = gui
 
--- Round Corners
-local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 8)
-corner.Parent = frame
+-- UICorner
+Instance.new("UICorner", frame)
 
--- Title Bar
+-- Title
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 30)
 title.BackgroundTransparency = 1
 title.Text = "Nova Script Loader"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.Font = Enum.Font.GothamBold
 title.TextSize = 16
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.Parent = frame
 
--- Button Template
-local function createButton(text, link)
+-- Create Button Function
+local function makeButton(text, positionY, url)
 	local btn = Instance.new("TextButton")
 	btn.Size = UDim2.new(1, -20, 0, 30)
-	btn.Position = UDim2.new(0, 10, 0, 0)
-	btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+	btn.Position = UDim2.new(0, 10, 0, positionY)
+	btn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
 	btn.Text = text
 	btn.Font = Enum.Font.Gotham
 	btn.TextSize = 14
 	btn.Parent = frame
-
-	local btnCorner = Instance.new("UICorner")
-	btnCorner.CornerRadius = UDim.new(0, 6)
-	btnCorner.Parent = btn
+	Instance.new("UICorner", btn)
 
 	btn.MouseButton1Click:Connect(function()
-		local success, code = pcall(function()
-			return game:HttpGet(link)
+		local success, result = pcall(function()
+			return game:HttpGet(url)
 		end)
 
-		if success and code then
-			local run = loadstring(code)
-			if run then
-				pcall(run)
+		if success then
+			local func, err = loadstring(result)
+			if func then
+				pcall(func)
+				gui:Destroy() -- Self-destruct
 			else
-				warn("Loadstring failed.")
+				warn("Loadstring error:", err)
 			end
 		else
-			warn("Failed to load script.")
+			warn("HttpGet failed:", result)
 		end
-
-		gui:Destroy()
 	end)
-
-	return btn
 end
 
 -- Buttons
-local valoblox = createButton("ValoBlox", "https://raw.githubusercontent.com/zxbnz/Valolo-Blox/main/code.lua")
-valoblox.Position = UDim2.new(0, 10, 0, 40)
+makeButton("ValoBlox", 40, "https://raw.githubusercontent.com/zxbnz/Valolo-Blox/main/code.lua")
+makeButton("Jailbird", 80, "https://raw.githubusercontent.com/zxbnz/JailBird-Cheat/main/code.lua")
+makeButton("Operation Siege", 120, "https://raw.githubusercontent.com/zxbnz/OS-Cheat/main/code.lua")
 
-local jailbird = createButton("Jailbird", "https://raw.githubusercontent.com/zxbnz/JailBird-Cheat/main/code.lua")
-jailbird.Position = UDim2.new(0, 10, 0, 80)
+-- Dragging
+local dragging = false
+local dragInput, startPos, dragStart
 
-local siege = createButton("
+title.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = frame.Position
+
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+UIS.InputChanged:Connect(function(input)
+	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+		local delta = input.Position - dragStart
+		frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	end
+end)
