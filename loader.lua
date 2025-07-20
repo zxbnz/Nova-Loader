@@ -22,7 +22,7 @@ ScreenGui.Parent = PlayerGui
 local Frame = Instance.new("Frame")
 Frame.Size = UDim2.new(0, 220, 0, 200)
 Frame.Position = UDim2.new(0.5, -110, 0.5, -100)
-Frame.BackgroundColor3 = Color3.fromRGB(60, 0, 0) -- Dark red
+Frame.BackgroundColor3 = Color3.fromRGB(100, 0, 0) -- Dark red
 Frame.BorderSizePixel = 0
 Frame.Parent = ScreenGui
 Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 8)
@@ -63,7 +63,7 @@ local scripts = {
 for _, data in ipairs(scripts) do
     local Btn = Instance.new("TextButton")
     Btn.Size = UDim2.new(1, 0, 0, 30)
-    Btn.BackgroundColor3 = Color3.fromRGB(100, 0, 0) -- Darker red for buttons
+    Btn.BackgroundColor3 = Color3.fromRGB(60, 0, 0) -- Even darker red for contrast
     Btn.TextColor3 = Color3.new(1, 1, 1)
     Btn.Font = Enum.Font.Gotham
     Btn.TextSize = 14
