@@ -2,11 +2,26 @@ local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
+local Lighting = game:GetService("Lighting")
 
 -- Destroy existing loader if it exists
 local existing = CoreGui:FindFirstChild("GameScriptLoader")
 if existing then
     existing:Destroy()
+end
+
+-- Create blur background
+local blur = Instance.new("BlurEffect")
+blur.Size = 12 -- adjust glow intensity here
+blur.Name = "UILoaderBlur"
+blur.Parent = Lighting
+
+-- Auto-remove blur when GUI closes
+local function removeBlur()
+    local existingBlur = Lighting:FindFirstChild("UILoaderBlur")
+    if existingBlur then
+        existingBlur:Destroy()
+    end
 end
 
 local LoaderGui = Instance.new("ScreenGui")
@@ -15,10 +30,16 @@ LoaderGui.ResetOnSpawn = false
 LoaderGui.IgnoreGuiInset = true
 LoaderGui.Parent = CoreGui
 
+LoaderGui.AncestryChanged:Connect(function(_, parent)
+    if not parent then
+        removeBlur()
+    end
+end)
+
 local Frame = Instance.new("Frame")
 Frame.Size = UDim2.new(0, 220, 0, 200)
 Frame.Position = UDim2.new(0.5, -110, 0.5, -100)
-Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Frame.BackgroundColor3 = Color3.fromRGB(35, 35, 50) -- slight bluish tone
 Frame.BorderSizePixel = 0
 Frame.AnchorPoint = Vector2.new(0.5, 0.5)
 Frame.Parent = LoaderGui
@@ -79,7 +100,7 @@ end
 for _, game in ipairs(Games) do
     local Btn = Instance.new("TextButton")
     Btn.Size = UDim2.new(1, 0, 0, 32)
-    Btn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    Btn.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
     Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
     Btn.Text = game.name
     Btn.Font = Enum.Font.GothamBold
@@ -91,10 +112,10 @@ for _, game in ipairs(Games) do
     btnCorner.CornerRadius = UDim.new(0, 6)
 
     Btn.MouseEnter:Connect(function()
-        TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(65, 65, 65)}):Play()
+        TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(65, 65, 85)}):Play()
     end)
     Btn.MouseLeave:Connect(function()
-        TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(45, 45, 45)}):Play()
+        TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(45, 45, 60)}):Play()
     end)
 
     Btn.MouseButton1Click:Connect(function()
