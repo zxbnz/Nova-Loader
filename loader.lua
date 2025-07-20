@@ -7,11 +7,11 @@ if not PlayerGui then
     return
 end
 
--- Clean up any existing loader
+-- Destroy old loader if exists
 local old = PlayerGui:FindFirstChild("NovaLoader")
 if old then old:Destroy() end
 
--- ScreenGui
+-- Create GUI
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "NovaLoader"
 ScreenGui.ResetOnSpawn = false
@@ -22,7 +22,7 @@ ScreenGui.Parent = PlayerGui
 local Frame = Instance.new("Frame")
 Frame.Size = UDim2.new(0, 220, 0, 200)
 Frame.Position = UDim2.new(0.5, -110, 0.5, -100)
-Frame.BackgroundColor3 = Color3.fromRGB(140, 0, 0)
+Frame.BackgroundColor3 = Color3.fromRGB(60, 0, 0) -- Dark red
 Frame.BorderSizePixel = 0
 Frame.Parent = ScreenGui
 Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 8)
@@ -63,7 +63,7 @@ local scripts = {
 for _, data in ipairs(scripts) do
     local Btn = Instance.new("TextButton")
     Btn.Size = UDim2.new(1, 0, 0, 30)
-    Btn.BackgroundColor3 = Color3.fromRGB(80, 0, 0)
+    Btn.BackgroundColor3 = Color3.fromRGB(100, 0, 0) -- Darker red for buttons
     Btn.TextColor3 = Color3.new(1, 1, 1)
     Btn.Font = Enum.Font.Gotham
     Btn.TextSize = 14
@@ -87,6 +87,6 @@ for _, data in ipairs(scripts) do
             warn("HttpGet failed:", scriptData)
         end
 
-        ScreenGui:Destroy() -- Self-destruct after click
+        ScreenGui:Destroy()
     end)
 end
