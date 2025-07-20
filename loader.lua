@@ -4,139 +4,131 @@ local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
 local Lighting = game:GetService("Lighting")
 
--- Clean up old loader
-local existing = CoreGui:FindFirstChild("ScriptLoader")
-if existing then existing:Destroy() end
-
--- Add blur effect
-local blur = Instance.new("BlurEffect")
-blur.Size = 12
-blur.Name = "ScriptLoaderBlur"
-blur.Parent = Lighting
-
--- Cleanup blur if GUI closes
-local function removeBlur()
-    local b = Lighting:FindFirstChild("ScriptLoaderBlur")
-    if b then b:Destroy() end
+-- REMOVE OLD
+if CoreGui:FindFirstChild("ScriptLoader") then
+    CoreGui.ScriptLoader:Destroy()
+end
+if Lighting:FindFirstChild("LoaderBlur") then
+    Lighting.LoaderBlur:Destroy()
 end
 
--- UI base
-local LoaderGui = Instance.new("ScreenGui")
-LoaderGui.Name = "ScriptLoader"
-LoaderGui.IgnoreGuiInset = true
-LoaderGui.ResetOnSpawn = false
-LoaderGui.Parent = CoreGui
+-- Blur Glow
+local blur = Instance.new("BlurEffect")
+blur.Size = 15
+blur.Name = "LoaderBlur"
+blur.Parent = Lighting
 
-LoaderGui.AncestryChanged:Connect(function(_, parent)
-    if not parent then removeBlur() end
-end)
+-- Main GUI
+local gui = Instance.new("ScreenGui")
+gui.Name = "ScriptLoader"
+gui.IgnoreGuiInset = true
+gui.ResetOnSpawn = false
+gui.Parent = CoreGui
 
-local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 220, 0, 200)
-Frame.Position = UDim2.new(0.5, -110, 0.5, -100)
-Frame.AnchorPoint = Vector2.new(0.5, 0.5)
-Frame.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
-Frame.BorderSizePixel = 0
-Frame.Parent = LoaderGui
+-- Main Frame
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 220, 0, 200)
+frame.Position = UDim2.new(0.5, -110, 0.5, -100)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+frame.BorderSizePixel = 0
+frame.AnchorPoint = Vector2.new(0.5, 0.5)
+frame.Parent = gui
 
-Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 8)
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
 
-local Layout = Instance.new("UIListLayout", Frame)
-Layout.Padding = UDim.new(0, 8)
-Layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-Layout.VerticalAlignment = Enum.VerticalAlignment.Top
+local layout = Instance.new("UIListLayout")
+layout.Padding = UDim.new(0, 10)
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+layout.VerticalAlignment = Enum.VerticalAlignment.Top
+layout.Parent = frame
 
-local Padding = Instance.new("UIPadding", Frame)
-Padding.PaddingTop = UDim.new(0, 12)
-Padding.PaddingLeft = UDim.new(0, 12)
-Padding.PaddingRight = UDim.new(0, 12)
-Padding.PaddingBottom = UDim.new(0, 12)
+local padding = Instance.new("UIPadding")
+padding.PaddingTop = UDim.new(0, 12)
+padding.PaddingLeft = UDim.new(0, 12)
+padding.PaddingRight = UDim.new(0, 12)
+padding.Parent = frame
 
 -- Title
-local Title = Instance.new("TextLabel", Frame)
-Title.Size = UDim2.new(1, 0, 0, 24)
-Title.BackgroundTransparency = 1
-Title.Text = "Script Loader"
-Title.Font = Enum.Font.GothamBold
-Title.TextSize = 16
-Title.TextColor3 = Color3.new(1,1,1)
+local title = Instance.new("TextLabel")
+title.Text = "Script Loader"
+title.Size = UDim2.new(1, 0, 0, 24)
+title.BackgroundTransparency = 1
+title.Font = Enum.Font.GothamBold
+title.TextSize = 16
+title.TextColor3 = Color3.new(1, 1, 1)
+title.Parent = frame
 
--- Scripts to load
+-- Script List
 local Scripts = {
     { name = "ValoBlox", link = "https://raw.githubusercontent.com/zxbnz/Valolo-Blox/refs/heads/main/code.lua" },
     { name = "Jailbird", link = "https://raw.githubusercontent.com/zxbnz/JailBird-Cheat/refs/heads/main/code.lua" },
     { name = "Operation Siege", link = "https://raw.githubusercontent.com/zxbnz/OS-Cheat/refs/heads/main/code.lua" },
 }
 
--- Function to load scripts
-local function loadScript(url)
-    local success, result = pcall(function()
-        return game:HttpGet(url)
-    end)
+-- Create Buttons
+for _, data in ipairs(Scripts) do
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, 0, 0, 32)
+    btn.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.Text = data.name
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 14
+    btn.Parent = frame
 
-    if success and result then
-        local fn, err = loadstring(result)
-        if fn then
-            pcall(fn)
-        else
-            warn("Loadstring failed:", err)
-        end
-    else
-        warn("HttpGet failed:", result)
-    end
-end
-
--- Buttons
-for _, script in ipairs(Scripts) do
-    local Btn = Instance.new("TextButton", Frame)
-    Btn.Size = UDim2.new(1, 0, 0, 32)
-    Btn.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
-    Btn.TextColor3 = Color3.new(1,1,1)
-    Btn.Text = script.name
-    Btn.Font = Enum.Font.GothamBold
-    Btn.TextSize = 14
-    Btn.AutoButtonColor = false
-
-    Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 6)
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
 
     -- Hover
-    Btn.MouseEnter:Connect(function()
-        TweenService:Create(Btn, TweenInfo.new(0.2), {
-            BackgroundColor3 = Color3.fromRGB(65, 65, 85)
+    btn.MouseEnter:Connect(function()
+        TweenService:Create(btn, TweenInfo.new(0.15), {
+            BackgroundColor3 = Color3.fromRGB(70, 70, 90)
         }):Play()
     end)
-    Btn.MouseLeave:Connect(function()
-        TweenService:Create(Btn, TweenInfo.new(0.2), {
+    btn.MouseLeave:Connect(function()
+        TweenService:Create(btn, TweenInfo.new(0.15), {
             BackgroundColor3 = Color3.fromRGB(45, 45, 60)
         }):Play()
     end)
 
-    Btn.MouseButton1Click:Connect(function()
-        -- Load script
-        loadScript(script.link)
+    -- Click
+    btn.MouseButton1Click:Connect(function()
+        -- Load Script
+        local success, result = pcall(function()
+            return game:HttpGet(data.link)
+        end)
+        if success then
+            local fn, err = loadstring(result)
+            if fn then
+                pcall(fn)
+            else
+                warn("Loadstring error:", err)
+            end
+        else
+            warn("HttpGet failed:", result)
+        end
 
-        -- Self-destruct
-        if LoaderGui then LoaderGui:Destroy() end
-        removeBlur()
+        -- Cleanup loader
+        gui:Destroy()
+        if blur then blur:Destroy() end
     end)
 end
 
--- Draggable UI
-local dragging = false
-local dragStart, startPos
+-- Drag
+local dragging, dragStart, startPos
 
-Frame.InputBegan:Connect(function(input)
+frame.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
         dragging = true
         dragStart = input.Position
-        startPos = Frame.Position
+        startPos = frame.Position
     end
 end)
 
 UserInputService.InputChanged:Connect(function(input)
     if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
         local delta = input.Position - dragStart
-        Frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
+                                   startPos.Y.Scale, startPos.Y.Offset + delta.Y)
     end
 end)
 
