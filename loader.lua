@@ -2,31 +2,33 @@ local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local PlayerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
 
--- Destroy existing loader if present
-local existing = PlayerGui:FindFirstChild("NovaLoader")
-if existing then existing:Destroy() end
+-- Remove old loader if exists
+if PlayerGui:FindFirstChild("NovaScriptLoader") then
+    PlayerGui:FindFirstChild("NovaScriptLoader"):Destroy()
+end
 
 -- Create GUI
 local gui = Instance.new("ScreenGui")
-gui.Name = "NovaLoader"
+gui.Name = "NovaScriptLoader"
 gui.ResetOnSpawn = false
 gui.Parent = PlayerGui
 
 -- Main Frame
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 250, 0, 250)
-frame.Position = UDim2.new(0.5, -125, 0.5, -125)
-frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+frame.Size = UDim2.new(0, 250, 0, 240)
+frame.Position = UDim2.new(0.5, -125, 0.5, -120)
+frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- black
 frame.BorderSizePixel = 0
 frame.Parent = gui
 
-local corner = Instance.new("UICorner", frame)
+-- Make corners rounded
+local corner = Instance.new("UICorner")
 corner.CornerRadius = UDim.new(0, 8)
+corner.Parent = frame
 
--- Title Label (also used to drag)
+-- Title Label (draggable area)
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 30)
-title.Position = UDim2.new(0, 0, 0, 0)
 title.BackgroundTransparency = 1
 title.Text = "Nova Script Loader"
 title.Font = Enum.Font.GothamBold
@@ -34,18 +36,65 @@ title.TextSize = 18
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.Parent = frame
 
--- Padding & layout
-local padding = Instance.new("UIPadding", frame)
+-- Scripts
+local scripts = {
+    {name = "ValoBlox", link = "https://raw.githubusercontent.com/zxbnz/Valolo-Blox/main/code.lua"},
+    {name = "Jailbird", link = "https://raw.githubusercontent.com/zxbnz/JailBird-Cheat/main/code.lua"},
+    {name = "Operation Siege", link = "https://raw.githubusercontent.com/zxbnz/OS-Cheat/main/code.lua"},
+}
+
+-- UI Layout
+local layout = Instance.new("UIListLayout")
+layout.Padding = UDim.new(0, 8)
+layout.FillDirection = Enum.FillDirection.Vertical
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+layout.VerticalAlignment = Enum.VerticalAlignment.Top
+layout.Parent = frame
+
+local padding = Instance.new("UIPadding")
 padding.PaddingTop = UDim.new(0, 40)
 padding.PaddingLeft = UDim.new(0, 10)
 padding.PaddingRight = UDim.new(0, 10)
+padding.Parent = frame
 
-local layout = Instance.new("UIListLayout", frame)
-layout.SortOrder = Enum.SortOrder.LayoutOrder
-layout.Padding = UDim.new(0, 8)
+-- Add buttons
+for _, script in ipairs(scripts) do
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(1, 0, 0, 32)
+    button.Text = script.name
+    button.Font = Enum.Font.Gotham
+    button.TextSize = 14
+    button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.Parent = frame
+
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(0, 6)
+    btnCorner.Parent = button
+
+    button.MouseButton1Click:Connect(function()
+        local success, result = pcall(function()
+            return game:HttpGet(script.link)
+        end)
+
+        if success then
+            local f, err = loadstring(result)
+            if f then
+                pcall(f)
+            else
+                warn("Script error:", err)
+            end
+        else
+            warn("Download failed:", result)
+        end
+
+        gui:Destroy() -- self-destruct
+    end)
+end
 
 -- Dragging logic
-local dragging, dragStart, startPos = false
+local dragging = false
+local dragStart, startPos
 
 title.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -70,46 +119,3 @@ UIS.InputChanged:Connect(function(input)
         )
     end
 end)
-
--- Scripts list
-local scripts = {
-    {name = "ValoBlox", link = "https://raw.githubusercontent.com/zxbnz/Valolo-Blox/main/code.lua"},
-    {name = "Jailbird", link = "https://raw.githubusercontent.com/zxbnz/JailBird-Cheat/main/code.lua"},
-    {name = "Operation Siege", link = "https://raw.githubusercontent.com/zxbnz/OS-Cheat/main/code.lua"},
-}
-
--- Create buttons
-for _, scriptInfo in ipairs(scripts) do
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(1, 0, 0, 30)
-    btn.Text = scriptInfo.name
-    btn.Font = Enum.Font.Gotham
-    btn.TextSize = 14
-    btn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.Parent = frame
-
-    local btnCorner = Instance.new("UICorner", btn)
-    btnCorner.CornerRadius = UDim.new(0, 6)
-
-    btn.MouseButton1Click:Connect(function()
-        local success, result = pcall(function()
-            return game:HttpGet(scriptInfo.link)
-        end)
-
-        if success and result then
-            local loadSuccess, err = pcall(function()
-                local func = loadstring(result)
-                if func then func() end
-            end)
-
-            if not loadSuccess then
-                warn("Error running script:", err)
-            end
-        else
-            warn("Error downloading script:", result)
-        end
-
-        gui:Destroy() -- Self-destruct loader
-    end)
-end
