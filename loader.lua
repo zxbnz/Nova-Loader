@@ -18,11 +18,11 @@ ScreenGui.ResetOnSpawn = false
 ScreenGui.IgnoreGuiInset = true
 ScreenGui.Parent = PlayerGui
 
--- Main Frame
+-- Main Frame (Black background)
 local Frame = Instance.new("Frame")
 Frame.Size = UDim2.new(0, 220, 0, 200)
 Frame.Position = UDim2.new(0.5, -110, 0.5, -100)
-Frame.BackgroundColor3 = Color3.fromRGB(100, 0, 0) -- Dark red
+Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Black
 Frame.BorderSizePixel = 0
 Frame.Parent = ScreenGui
 Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 8)
@@ -34,7 +34,7 @@ Title.BackgroundTransparency = 1
 Title.Text = "Nova"
 Title.Font = Enum.Font.GothamBold
 Title.TextSize = 20
-Title.TextColor3 = Color3.new(1, 1, 1)
+Title.TextColor3 = Color3.new(1, 1, 1) -- White
 Title.Parent = Frame
 
 -- Layout
@@ -63,8 +63,8 @@ local scripts = {
 for _, data in ipairs(scripts) do
     local Btn = Instance.new("TextButton")
     Btn.Size = UDim2.new(1, 0, 0, 30)
-    Btn.BackgroundColor3 = Color3.fromRGB(60, 0, 0) -- Even darker red for contrast
-    Btn.TextColor3 = Color3.new(1, 1, 1)
+    Btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Dark gray for contrast
+    Btn.TextColor3 = Color3.new(1, 1, 1) -- White
     Btn.Font = Enum.Font.Gotham
     Btn.TextSize = 14
     Btn.Text = data.name
