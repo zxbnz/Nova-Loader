@@ -1,169 +1,165 @@
 local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
--- Cleanup
-local old = PlayerGui:FindFirstChild("NovaLoader")
-if old then old:Destroy() end
+-- Destroy existing UI if present
+local oldGui = PlayerGui:FindFirstChild("NovaLoader")
+if oldGui then oldGui:Destroy() end
 
--- UI
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "NovaLoader"
-ScreenGui.ResetOnSpawn = false
-ScreenGui.IgnoreGuiInset = true
-ScreenGui.Parent = PlayerGui
-
-local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 240, 0, 260)
-Frame.Position = UDim2.new(0.5, -120, 0.5, -130)
-Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Start dark theme
-Frame.BorderSizePixel = 0
-Frame.Parent = ScreenGui
-Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 8)
-
-local TitleBar = Instance.new("Frame")
-TitleBar.Size = UDim2.new(1, 0, 0, 30)
-TitleBar.BackgroundTransparency = 1
-TitleBar.Parent = Frame
-
-local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, -30, 1, 0)
-Title.Position = UDim2.new(0, 5, 0, 0)
-Title.BackgroundTransparency = 1
-Title.Text = "Nova Script Loader"
-Title.Font = Enum.Font.GothamBold
-Title.TextSize = 18
-Title.TextColor3 = Color3.new(1, 1, 1)
-Title.TextXAlignment = Enum.TextXAlignment.Left
-Title.Parent = TitleBar
-
--- Close button
-local CloseBtn = Instance.new("TextButton")
-CloseBtn.Size = UDim2.new(0, 24, 0, 24)
-CloseBtn.Position = UDim2.new(1, -28, 0, 3)
-CloseBtn.Text = "X"
-CloseBtn.Font = Enum.Font.GothamBold
-CloseBtn.TextSize = 14
-CloseBtn.TextColor3 = Color3.new(1, 1, 1)
-CloseBtn.BackgroundColor3 = Color3.fromRGB(80, 0, 0)
-CloseBtn.Parent = TitleBar
-Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(1, 0)
-
-CloseBtn.MouseButton1Click:Connect(function()
-    ScreenGui:Destroy()
-end)
-
--- Drag to move
-local dragging, dragStart, startPos = false, nil, nil
-TitleBar.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        dragStart = input.Position
-        startPos = Frame.Position
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
-            end
-        end)
-    end
-end)
-game:GetService("UserInputService").InputChanged:Connect(function(input)
-    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local delta = input.Position - dragStart
-        Frame.Position = UDim2.new(
-            startPos.X.Scale, startPos.X.Offset + delta.X,
-            startPos.Y.Scale, startPos.Y.Offset + delta.Y
-        )
-    end
-end)
-
--- Layout & Padding
-local Layout = Instance.new("UIListLayout")
-Layout.Padding = UDim.new(0, 8)
-Layout.FillDirection = Enum.FillDirection.Vertical
-Layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-Layout.VerticalAlignment = Enum.VerticalAlignment.Top
-Layout.SortOrder = Enum.SortOrder.LayoutOrder
-Layout.Parent = Frame
-
-local Padding = Instance.new("UIPadding")
-Padding.PaddingTop = UDim.new(0, 40)
-Padding.PaddingLeft = UDim.new(0, 10)
-Padding.PaddingRight = UDim.new(0, 10)
-Padding.Parent = Frame
-
--- Game list
-local Games = {
-    {name = "ValoBlox", link = "https://raw.githubusercontent.com/zxbnz/Valolo-Blox/main/code.lua"},
-    {name = "Jailbird", link = "https://raw.githubusercontent.com/zxbnz/JailBird-Cheat/main/code.lua"},
-    {name = "Operation Siege", link = "https://raw.githubusercontent.com/zxbnz/OS-Cheat/main/code.lua"},
-}
-
--- Theme colors
+-- Themes
 local darkTheme = {
-    bg = Color3.fromRGB(0, 0, 0),
-    text = Color3.new(1, 1, 1),
-    button = Color3.fromRGB(30, 30, 30)
+	bg = Color3.fromRGB(15, 15, 15),
+	text = Color3.fromRGB(255, 255, 255),
+	button = Color3.fromRGB(35, 35, 35)
 }
 local lightTheme = {
-    bg = Color3.fromRGB(245, 245, 245),
-    text = Color3.new(0, 0, 0),
-    button = Color3.fromRGB(200, 200, 200)
+	bg = Color3.fromRGB(240, 240, 240),
+	text = Color3.fromRGB(0, 0, 0),
+	button = Color3.fromRGB(200, 200, 200)
 }
 local currentTheme = darkTheme
 
+-- Create GUI
+local gui = Instance.new("ScreenGui")
+gui.Name = "NovaLoader"
+gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
+gui.Parent = PlayerGui
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 250, 0, 300)
+frame.Position = UDim2.new(0.5, -125, 0.5, -150)
+frame.BackgroundColor3 = currentTheme.bg
+frame.BorderSizePixel = 0
+frame.Parent = gui
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 8)
+corner.Parent = frame
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -30, 0, 30)
+title.Position = UDim2.new(0, 5, 0, 0)
+title.BackgroundTransparency = 1
+title.Text = "Nova Script Loader"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 18
+title.TextColor3 = currentTheme.text
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = frame
+
+-- Close Button
+local close = Instance.new("TextButton")
+close.Size = UDim2.new(0, 24, 0, 24)
+close.Position = UDim2.new(1, -28, 0, 3)
+close.Text = "X"
+close.Font = Enum.Font.GothamBold
+close.TextSize = 14
+close.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
+close.TextColor3 = Color3.new(1, 1, 1)
+close.Parent = frame
+Instance.new("UICorner", close).Parent = close
+close.MouseButton1Click:Connect(function()
+	gui:Destroy()
+end)
+
+-- Drag support
+local dragging, dragStart, startPos
+title.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = frame.Position
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+UIS.InputChanged:Connect(function(input)
+	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+		local delta = input.Position - dragStart
+		frame.Position = UDim2.new(
+			startPos.X.Scale, startPos.X.Offset + delta.X,
+			startPos.Y.Scale, startPos.Y.Offset + delta.Y
+		)
+	end
+end)
+
+-- Buttons Layout
+local layout = Instance.new("UIListLayout")
+layout.Padding = UDim.new(0, 8)
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+layout.SortOrder = Enum.SortOrder.LayoutOrder
+layout.Parent = frame
+
+local padding = Instance.new("UIPadding")
+padding.PaddingTop = UDim.new(0, 40)
+padding.PaddingLeft = UDim.new(0, 10)
+padding.PaddingRight = UDim.new(0, 10)
+padding.Parent = frame
+
+-- Game scripts
+local Games = {
+	{name = "ValoBlox", link = "https://raw.githubusercontent.com/zxbnz/Valolo-Blox/main/code.lua"},
+	{name = "Jailbird", link = "https://raw.githubusercontent.com/zxbnz/JailBird-Cheat/main/code.lua"},
+	{name = "Operation Siege", link = "https://raw.githubusercontent.com/zxbnz/OS-Cheat/main/code.lua"},
+}
+
+-- Theme switch
 local function applyTheme()
-    Frame.BackgroundColor3 = currentTheme.bg
-    Title.TextColor3 = currentTheme.text
-    CloseBtn.TextColor3 = currentTheme.text
-    for _, btn in pairs(Frame:GetChildren()) do
-        if btn:IsA("TextButton") and btn.Name ~= "Close" then
-            btn.BackgroundColor3 = currentTheme.button
-            btn.TextColor3 = currentTheme.text
-        end
-    end
+	frame.BackgroundColor3 = currentTheme.bg
+	title.TextColor3 = currentTheme.text
+	for _, child in ipairs(frame:GetChildren()) do
+		if child:IsA("TextButton") and child.Name ~= "Close" then
+			child.BackgroundColor3 = currentTheme.button
+			child.TextColor3 = currentTheme.text
+		end
+	end
 end
 
--- Buttons
-for _, gameData in ipairs(Games) do
-    local Btn = Instance.new("TextButton")
-    Btn.Size = UDim2.new(1, 0, 0, 30)
-    Btn.BackgroundColor3 = currentTheme.button
-    Btn.TextColor3 = currentTheme.text
-    Btn.Text = gameData.name
-    Btn.Font = Enum.Font.Gotham
-    Btn.TextSize = 14
-    Btn.Parent = Frame
-    Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 6)
+for _, g in ipairs(Games) do
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(1, 0, 0, 32)
+	btn.Text = g.name
+	btn.Font = Enum.Font.Gotham
+	btn.TextSize = 14
+	btn.BackgroundColor3 = currentTheme.button
+	btn.TextColor3 = currentTheme.text
+	btn.Parent = frame
+	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
 
-    Btn.MouseButton1Click:Connect(function()
-        local success, script = pcall(function()
-            return game:HttpGet(gameData.link)
-        end)
-        if success then
-            local loaded, err = loadstring(script)
-            if loaded then pcall(loaded) else warn("Loadstring error:", err) end
-        else
-            warn("HttpGet failed:", script)
-        end
-        ScreenGui:Destroy()
-    end)
+	btn.MouseButton1Click:Connect(function()
+		local success, result = pcall(function()
+			return game:HttpGet(g.link)
+		end)
+		if success then
+			local loaded = loadstring(result)
+			if loaded then pcall(loaded) end
+		else
+			warn("Failed to load script:", result)
+		end
+		gui:Destroy()
+	end)
 end
 
--- Theme switch button
-local ThemeSwitch = Instance.new("TextButton")
-ThemeSwitch.Size = UDim2.new(1, 0, 0, 30)
-ThemeSwitch.BackgroundColor3 = currentTheme.button
-ThemeSwitch.TextColor3 = currentTheme.text
-ThemeSwitch.Text = "Switch Theme"
-ThemeSwitch.Font = Enum.Font.GothamBold
-ThemeSwitch.TextSize = 14
-ThemeSwitch.Parent = Frame
-Instance.new("UICorner", ThemeSwitch).CornerRadius = UDim.new(0, 6)
+-- Theme toggle button
+local themeBtn = Instance.new("TextButton")
+themeBtn.Size = UDim2.new(1, 0, 0, 30)
+themeBtn.Text = "Switch Theme"
+themeBtn.Font = Enum.Font.GothamBold
+themeBtn.TextSize = 14
+themeBtn.BackgroundColor3 = currentTheme.button
+themeBtn.TextColor3 = currentTheme.text
+themeBtn.Parent = frame
+Instance.new("UICorner", themeBtn).CornerRadius = UDim.new(0, 6)
 
-ThemeSwitch.MouseButton1Click:Connect(function()
-    currentTheme = (currentTheme == darkTheme) and lightTheme or darkTheme
-    applyTheme()
+themeBtn.MouseButton1Click:Connect(function()
+	currentTheme = (currentTheme == darkTheme) and lightTheme or darkTheme
+	applyTheme()
 end)
 
 applyTheme()
