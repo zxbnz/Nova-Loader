@@ -12,7 +12,7 @@ end
 
 -- Create blur background
 local blur = Instance.new("BlurEffect")
-blur.Size = 12 -- adjust glow intensity here
+blur.Size = 12
 blur.Name = "UILoaderBlur"
 blur.Parent = Lighting
 
@@ -39,7 +39,7 @@ end)
 local Frame = Instance.new("Frame")
 Frame.Size = UDim2.new(0, 220, 0, 200)
 Frame.Position = UDim2.new(0.5, -110, 0.5, -100)
-Frame.BackgroundColor3 = Color3.fromRGB(35, 35, 50) -- slight bluish tone
+Frame.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
 Frame.BorderSizePixel = 0
 Frame.AnchorPoint = Vector2.new(0.5, 0.5)
 Frame.Parent = LoaderGui
@@ -120,6 +120,8 @@ for _, game in ipairs(Games) do
 
     Btn.MouseButton1Click:Connect(function()
         loadGameScript(game.link)
+        LoaderGui:Destroy()      -- 💥 Self-destruct the GUI
+        removeBlur()             -- ✨ Remove the blur
     end)
 end
 
