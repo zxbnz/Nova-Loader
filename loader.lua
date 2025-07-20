@@ -1,13 +1,15 @@
 local players = game:GetService("Players")
-local core_gui = game:GetService("CoreGui")
+local run_service = game:GetService("RunService")
 local user_input_service = game:GetService("UserInputService")
+local tween_service = game:GetService("TweenService")
+local core_gui = game:GetService("CoreGui")
 
--- Clean up old GUI if already present
-if core_gui:FindFirstChild("homohackLoader") then
-    core_gui:FindFirstChild("homohackLoader"):Destroy()
-end
+local loader = Instance.new("ScreenGui")
+loader.Name = "homohackLoader"
+loader.ResetOnSpawn = false
+loader.IgnoreGuiInset = true
+loader.Parent = core_gui
 
--- Game list
 local games = {
 	{ name = "ValoBlox", link = "https://raw.githubusercontent.com/zxbnz/Valolo-Blox/refs/heads/main/code" },
 	{ name = "Jailbird", link = "https://raw.githubusercontent.com/zxbnz/JailBird-Cheat/refs/heads/main/code" },
@@ -15,49 +17,32 @@ local games = {
 }
 
 -- UI Setup
-local loader = Instance.new("ScreenGui")
-loader.Name = "homohackLoader"
-loader.ResetOnSpawn = false
-loader.Parent = core_gui
-
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 250, 0, 200)
-frame.Position = UDim2.new(0.5, -125, 0.5, -100)
+frame.Size = UDim2.new(0, 200, 0, #games * 40 + 40)
+frame.Position = UDim2.new(0.5, -100, 0.5, -((#games * 40 + 40) / 2))
 frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 frame.BorderSizePixel = 0
 frame.Parent = loader
 
-local uicorner = Instance.new("UICorner", frame)
-uicorner.CornerRadius = UDim.new(0, 6)
+local stroke = Instance.new("UIStroke", frame)
+stroke.Color = Color3.fromRGB(60, 60, 60)
+stroke.Thickness = 2
 
-local title = Instance.new("TextLabel")
-title.Text = "Nova Game Loader"
-title.Size = UDim2.new(1, 0, 0, 30)
-title.BackgroundTransparency = 1
-title.TextColor3 = Color3.new(1,1,1)
-title.Font = Enum.Font.SourceSansBold
-title.TextSize = 18
-title.Parent = frame
+local layout = Instance.new("UIListLayout")
+layout.Padding = UDim.new(0, 8)
+layout.FillDirection = Enum.FillDirection.Vertical
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+layout.VerticalAlignment = Enum.VerticalAlignment.Top
+layout.Parent = frame
 
--- Dragging functionality
-local dragging = false
-local dragStart, startPos
+local padding = Instance.new("UIPadding")
+padding.PaddingTop = UDim.new(0, 10)
+padding.PaddingBottom = UDim.new(0, 10)
+padding.PaddingLeft = UDim.new(0, 10)
+padding.PaddingRight = UDim.new(0, 10)
+padding.Parent = frame
 
-title.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		dragging = true
-		dragStart = input.Position
-		startPos = frame.Position
-	end
-end)
-
-user_input_service.InputEnded:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		dragging = false
-	end
-end)
-
-user_input_service.InputChanged:Connect(function(input)
-	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-		local delta = input.Position - dragStart
-		frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale
+-- Function to load a script
+local function loadGameScript(url)
+	pcall(function()
+		local s
