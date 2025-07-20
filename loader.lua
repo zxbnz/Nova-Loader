@@ -1,111 +1,92 @@
 local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:FindFirstChildOfClass("PlayerGui")
 
-local player = Players.LocalPlayer
-local PlayerGui = player:WaitForChild("PlayerGui")
-
--- Destroy previous loader if exists
-if PlayerGui:FindFirstChild("NovaLoader") then
-    PlayerGui:FindFirstChild("NovaLoader"):Destroy()
+if not PlayerGui then
+    warn("PlayerGui not found")
+    return
 end
 
--- UI
-local gui = Instance.new("ScreenGui")
-gui.Name = "NovaLoader"
-gui.ResetOnSpawn = false
-gui.IgnoreGuiInset = false
-gui.Parent = PlayerGui
+-- Clean up any existing loader
+local old = PlayerGui:FindFirstChild("NovaLoader")
+if old then old:Destroy() end
 
-local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 250, 0, 240)
-frame.Position = UDim2.new(0.5, -125, 0.5, -120)
-frame.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
-frame.BorderSizePixel = 0
-frame.AnchorPoint = Vector2.new(0.5, 0.5)
-frame.Parent = gui
+-- ScreenGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "NovaLoader"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.IgnoreGuiInset = true
+ScreenGui.Parent = PlayerGui
 
-Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 8)
+-- Main Frame
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 220, 0, 200)
+Frame.Position = UDim2.new(0.5, -110, 0.5, -100)
+Frame.BackgroundColor3 = Color3.fromRGB(140, 0, 0)
+Frame.BorderSizePixel = 0
+Frame.Parent = ScreenGui
+Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 8)
 
--- Title
-local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 35)
-title.BackgroundTransparency = 1
-title.Text = "Nova"
-title.Font = Enum.Font.GothamBold
-title.TextSize = 20
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.Parent = frame
+-- Title Label
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.BackgroundTransparency = 1
+Title.Text = "Nova"
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 20
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.Parent = Frame
 
 -- Layout
-local layout = Instance.new("UIListLayout", frame)
-layout.Padding = UDim.new(0, 8)
-layout.FillDirection = Enum.FillDirection.Vertical
-layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-layout.VerticalAlignment = Enum.VerticalAlignment.Top
+local Layout = Instance.new("UIListLayout")
+Layout.Padding = UDim.new(0, 10)
+Layout.FillDirection = Enum.FillDirection.Vertical
+Layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+Layout.VerticalAlignment = Enum.VerticalAlignment.Top
+Layout.SortOrder = Enum.SortOrder.LayoutOrder
+Layout.Parent = Frame
 
 -- Padding
-local padding = Instance.new("UIPadding", frame)
-padding.PaddingTop = UDim.new(0, 10)
-padding.PaddingLeft = UDim.new(0, 10)
-padding.PaddingRight = UDim.new(0, 10)
+local Padding = Instance.new("UIPadding")
+Padding.PaddingTop = UDim.new(0, 10)
+Padding.PaddingLeft = UDim.new(0, 10)
+Padding.PaddingRight = UDim.new(0, 10)
+Padding.Parent = Frame
 
--- Button Scripts
+-- Script Buttons
 local scripts = {
-    { name = "ValoBlox", link = "https://raw.githubusercontent.com/zxbnz/Valolo-Blox/main/code.lua" },
-    { name = "Jailbird", link = "https://raw.githubusercontent.com/zxbnz/JailBird-Cheat/main/code.lua" },
-    { name = "Operation Siege", link = "https://raw.githubusercontent.com/zxbnz/OS-Cheat/main/code.lua" },
+    {name = "ValoBlox", link = "https://raw.githubusercontent.com/zxbnz/Valolo-Blox/main/code.lua"},
+    {name = "Jailbird", link = "https://raw.githubusercontent.com/zxbnz/JailBird-Cheat/main/code.lua"},
+    {name = "Operation Siege", link = "https://raw.githubusercontent.com/zxbnz/OS-Cheat/main/code.lua"},
 }
 
 for _, data in ipairs(scripts) do
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(1, 0, 0, 30)
-    btn.BackgroundColor3 = Color3.fromRGB(90, 0, 0)
-    btn.TextColor3 = Color3.new(1, 1, 1)
-    btn.Text = data.name
-    btn.Font = Enum.Font.GothamBold
-    btn.TextSize = 14
-    btn.Parent = frame
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+    local Btn = Instance.new("TextButton")
+    Btn.Size = UDim2.new(1, 0, 0, 30)
+    Btn.BackgroundColor3 = Color3.fromRGB(80, 0, 0)
+    Btn.TextColor3 = Color3.new(1, 1, 1)
+    Btn.Font = Enum.Font.Gotham
+    Btn.TextSize = 14
+    Btn.Text = data.name
+    Btn.Parent = Frame
+    Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 6)
 
-    btn.MouseButton1Click:Connect(function()
-        local success, result = pcall(function()
+    Btn.MouseButton1Click:Connect(function()
+        local success, scriptData = pcall(function()
             return game:HttpGet(data.link)
         end)
 
         if success then
-            local func, err = loadstring(result)
-            if func then
-                pcall(func)
+            local loaded, err = loadstring(scriptData)
+            if loaded then
+                pcall(loaded)
             else
-                warn("Loadstring error:", err)
+                warn("Loadstring failed:", err)
             end
         else
-            warn("HttpGet error:", result)
+            warn("HttpGet failed:", scriptData)
         end
 
-        gui:Destroy() -- Self-destruct
+        ScreenGui:Destroy() -- Self-destruct after click
     end)
 end
-
--- Drag support
-local dragging, dragStart, startPos
-frame.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        dragStart = input.Position
-        startPos = frame.Position
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
-            end
-        end)
-    end
-end)
-
-UserInputService.InputChanged:Connect(function(input)
-    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local delta = input.Position - dragStart
-        frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
-                                   startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end)
