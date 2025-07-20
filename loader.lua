@@ -1,9 +1,4 @@
 -- this code is awful so dont mind it plz
-local players = game:GetService("Players");
-local run_service = game:GetService("RunService");
-local user_input_service = game:GetService("UserInputService");
-local tween_service = game:GetService("TweenService");
-local core_gui = game:GetService("CoreGui");
 
 local loader = Instance.new("ScreenGui", core_gui);
 
