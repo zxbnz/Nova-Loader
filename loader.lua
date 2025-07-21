@@ -66,9 +66,9 @@ local function makeButton(text, positionY, url)
 end
 
 -- Buttons
-makeButton("ValoBlox", 40, "https://raw.githubusercontent.com/zxbnz/Valolo-Blox/main/code.lua")
-makeButton("Jailbird", 80, "https://raw.githubusercontent.com/zxbnz/JailBird-Cheat/main/code.lua")
-makeButton("Operation Siege", 120, "https://raw.githubusercontent.com/zxbnz/OS-Cheat/main/code.lua")
+makeButton("ValoBlox", 40, "https://raw.githubusercontent.com/zxbnz/Valolo-Blox/refs/heads/main/code.lua")
+makeButton("Jailbird", 80, "https://raw.githubusercontent.com/zxbnz/JailBird-Cheat/refs/heads/main/code.lua")
+makeButton("Operation Siege", 120, "https://raw.githubusercontent.com/zxbnz/OS-Cheat/refs/heads/main/code.lua")
 
 -- Dragging
 local dragging = false
