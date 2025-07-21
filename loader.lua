@@ -94,3 +94,19 @@ UIS.InputChanged:Connect(function(input)
 		frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
 	end
 end)
+
+-- Discord Invite TextBox at bottom
+local inviteBox = Instance.new("TextBox")
+inviteBox.AnchorPoint = Vector2.new(0, 1) -- anchor bottom left
+inviteBox.Position = UDim2.new(0, 10, 1, -10) -- 10px above bottom edge
+inviteBox.Size = UDim2.new(1, -20, 0, 30)
+inviteBox.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+inviteBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+inviteBox.Font = Enum.Font.Gotham
+inviteBox.TextSize = 14
+inviteBox.Text = "https://discord.gg/YOUR_INVITE"  -- Replace this
+inviteBox.ClearTextOnFocus = false
+inviteBox.TextEditable = false
+inviteBox.Parent = frame
+Instance.new("UICorner", inviteBox)
+
