@@ -70,7 +70,7 @@ end
 makeButton("ValoBlox", 40, "https://raw.githubusercontent.com/zxbnz/Valolo-Blox/refs/heads/main/code.lua")
 makeButton("Jailbird", 80, "https://raw.githubusercontent.com/zxbnz/JailBird-Cheat/refs/heads/main/code.lua")
 makeButton("Operation Siege", 120, "https://raw.githubusercontent.com/zxbnz/OS-Cheat/refs/heads/main/code.lua")
-makeButton("Counter Blox", 160, "https://raw.githubusercontent.com/zxbnz/CounterBlox-Script/main/code.lua")
+makeButton("Counter Blox", 160, "https://raw.githubusercontent.com/zxbnz/CounterBlox/refs/heads/main/script.lua")
 
 
 -- Dragging
